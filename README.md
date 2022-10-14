@@ -34,3 +34,6 @@ a timeline of incidents
 themes :)
 likelyhood of an incident today meter
 a way to export the data
+recently viewed pages
+- by account
+- by session/localstorage
