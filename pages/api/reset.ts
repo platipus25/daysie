@@ -1,7 +1,47 @@
 import { hashids } from '../../lib/lib'
 import { prisma } from '../../lib/db'
+import { unstable_getServerSession } from "next-auth/next"
+import { authOptions } from './auth/[...nextauth]'
+import { Awaitable, NextAuthOptions } from 'next-auth'
 
 export default async function handler(req, res) {
+    const options: NextAuthOptions = {
+      ...authOptions,
+      callbacks: {
+        ...authOptions.callbacks,
+        async session({ session, token, user }) {
+          //console.log(session, token, user)
+
+          // send the user id through to the handler
+          const s = {
+            ...session,
+            user: {
+              ...session.user,
+              id: user.id
+            }
+          }
+          
+          return s
+        }
+      }
+    }
+
+    const session = await unstable_getServerSession(req, res, options)
+
+    if (!session) {
+      res.status(401).json({ message: "You must be logged in." });
+      return;
+    }
+
+    const userId = (session.user as unknown as { id: string }).id
+
+    const user = await prisma.user.findUnique({ 
+      where: { 
+        id: userId,
+      }
+    })
+    console.log(user)
+
     // Get data submitted in request's body.
     const body = req.body
   
@@ -27,7 +67,8 @@ export default async function handler(req, res) {
     const result = await prisma.incident.create({
       data: {
         date: new Date(),
-        page: { connect: { id: page.id } },
+        user: { connect: { id: userId }},
+        page: { connect: { id: page.id }},
       },
     })
 
@@ -37,8 +78,10 @@ export default async function handler(req, res) {
       include: { incidents: true },
       where: { id: dbId },
     })
+
+    console.log(page)
   
     // Found the name.
-    // Sends a HTTP success code
+    // Sends a HTTP success code 
     res.status(200).json({ data: JSON.parse(JSON.stringify(page)) })
   }

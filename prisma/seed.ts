@@ -11,7 +11,7 @@ const pageData: Prisma.PageCreateInput[] = [
           date: new Date(2022, 7, 30)
         },
         {
-          date: new Date(2022, 9, 15)
+          date: new Date(2022, 8, 15)
         }
       ],
     },

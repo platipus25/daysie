@@ -1,6 +1,5 @@
 import { useState, Fragment } from 'react'
 import { Dialog, Transition, Popover } from '@headlessui/react'
-import { useTimeout } from 'usehooks-ts'
 
 interface CopyLinkProps {
     href: string,

@@ -2,7 +2,7 @@ import { compareDesc, differenceInCalendarDays } from 'date-fns'
 import Hashids from 'hashids'
 import { Incident } from '@prisma/client'
 
-export const hashids = new Hashids("this is my salt");
+export const hashids = new Hashids("this is my salt", 8);
 
 export function countDays(incidents: Incident[]): number | null {
     const dates = incidents.map(incident => new Date(incident.date))
