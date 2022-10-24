@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { GetServerSideProps } from 'next'
-import { countDays, hashids } from '../lib/lib'
+import { countDays, latestIncident, hashids } from '../lib/lib'
 import { prisma } from '../lib/db'
 import styles from '../styles/Home.module.css'
 import PageCard from '../components/PageCard'
@@ -11,23 +11,47 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 
   const pages = await prisma.page.findMany({
-    include: { incidents: true },
+    include: { 
+      incidents: true,
+    },
   })
 
   //console.log(pages)
-  const uiPages = pages.map(page => {
+  const uiPages = await Promise.all(
+    pages.map(async page => {
+    const latest = latestIncident(page.incidents)
+    let lastEditedBy = null
+    if (latest !== null && latest.userId !== null) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: latest.userId
+        }
+      })
+      
+      lastEditedBy = {
+        name: user.name,
+        image: user.image,
+      }
+    }
+
     return {
       count: countDays(page.incidents),
       id: hashids.encode(page.id),
       title: page.title,
+      lastEditedBy: lastEditedBy,
     }
-  })
+  }))
 
   return { props: { pages: uiPages } }
 }
 
 interface HomeProps {
-  pages: { count: number, id: string, title: string, }[],
+  pages: { 
+    count: number, 
+    id: string, 
+    title: string, 
+    lastEditedBy?: { name: string, image: string },
+  }[],
 }
 
 export default function Home(props: HomeProps) {
