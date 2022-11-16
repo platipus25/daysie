@@ -6,6 +6,9 @@ import { prisma } from '../lib/db'
 import styles from '../styles/Home.module.css'
 import PageCard from '../components/PageCard'
 import Header from '../components/Header'
+import Footer from '../components/Footer'
+import { PlusIcon } from '@heroicons/react/24/solid'
+import Link from 'next/link'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -70,24 +73,20 @@ export default function Home(props: HomeProps) {
 
       <Header />
 
-      <main className="min-h-screen flex place-content-center p-4">
-        <div className="flex flex-col gap-3 h-fit">
+      <main className="min-h-screen content-center flex flex-col items-center px-4">
+        {/*<div className='self-center w-2/4'>
+          <Link href="/create">
+          <button className='p-2 rounded-full bg-blue-500 active:bg-blue-600'>
+            <PlusIcon className="w-6 h-6" />
+          </button>
+          </Link>
+        </div>*/}
+        <div className="flex flex-col gap-3 h-fit w-fit">
           {pages}
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <Footer />
     </div>
   )
 }
